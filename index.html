@@ -1,0 +1,107 @@
+<!doctype html>
+<head>
+	<script src="http://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+	<script type="text/javascript" src="JavaScript/ShapeClipAPI.js"></script>
+	<script type="text/javascript" src="config.js"></script>
+	<link rel=StyleSheet href="style.css" type="text/css">
+</head>
+
+<body>
+<h1 style="font-family:calibri">ShapeMap</h1>
+
+<br>
+<br>
+<div id="maindiv"></div>
+
+</body>
+
+</html>
+
+<script type="text/javascript">
+
+var pads = [];
+
+var PAUSED_STATE=true;
+var PLAY_STATE=true;
+
+$(document).ready(function() {
+	var max=10;
+	var ypos = 80;
+	createGrid(max,ypos);
+	valArray=[0,0,0,0,
+			  0,0,0,0,
+			  0,0,0,0,
+			  0,0,0,0];
+	mapValues(pads,valArray);
+
+	(function theLoop (i) {
+		setTimeout(function () {
+			console.log(i);
+			if(i<50){
+				valArray=[0,0,0,0,
+							0,0,0,0,
+							0,0,0,0,
+							256,256,256,256];}
+			clearGrid();
+			createGrid(max++, ypos);
+			mapValues(pads,valArray);
+			if (--i) {          // If i > 0, keep going
+				theLoop(i);       // Call the loop again, and pass it the current value of i
+			}
+		}, 10);
+	})(200);
+	
+});
+
+function clearGrid() {
+	$('div#maindiv').empty();
+	pads = [];
+}
+
+/*
+* This creates the pixel grid that controls the ShapeClips color and height
+*/
+function createGrid(xval, yval) {
+	var x=1;
+	var y=1;
+	var count=1;
+	// Correct ppi value.
+	var agent = navigator.userAgent.toLowerCase();
+	if 		(agent.indexOf("windows") 	!= -1) 	{ }
+	if 		(agent.indexOf("nexus 5") 	!= -1) 	{ __ppi(150); }
+	else if (agent.indexOf("ipad") 		!= -1) 	{ __ppi(160); }
+	else if (agent.indexOf("nexus 10") 		!= -1) 	{ __ppi(180); }
+	console.log("User Agent: " + agent);
+	
+	// The size of the shape-clip pad in mm.
+	var SC_SIZE = __px(20);
+	// The starting position of the grid
+	var X = xval;	var Y = yval;
+	
+	for (var x = 0; x < h_max; ++x) {
+		for (var y = 0; y < v_max; ++y) {
+			var pX = X + (x * 25); // horizontal spacing between pixels	
+			var pY = Y + (y * 25); // vertical spacing between pixels			
+			var pad = null;
+			pad = new ShapeClip({x: __px(pX), y: __px(pY), width: SC_SIZE, height: SC_SIZE});
+			
+			//pad._id = "" + x + "x" + y;
+			pad._id="pixel_"+count;
+			count++;
+			pad.outline(true);
+			pad.rotate(180);
+			pad.PULSE_WIDTH=OVERRIDE_PULSE_WIDTH;
+			pads.push(pad);
+			$('div#maindiv').append(pad._element);
+		}
+	}
+}
+
+function mapValues(pads, values) {
+	var count=0;
+	for(var i=0; i<values.length; i++) {
+		pads[i].height(values[i]*0.01);
+	}
+}
+
+</script>
