@@ -26,5 +26,5 @@ var colors=[
 [128,0,0]
 ];
 
-//Define audio file to load
-var audioFile = "test_song2.mp3";
+//Define PPI if needed
+forcePPI = 60;

@@ -26,7 +26,7 @@ var PLAY_STATE=true;
 
 $(document).ready(function() {
 	var max=10;
-	var ypos = 80;
+	var ypos = 230;
 	createGrid(max,ypos);
 	valArray=[0,0,0,0,
 			  0,0,0,0,
@@ -42,20 +42,28 @@ $(document).ready(function() {
 							0,0,0,0,
 							0,0,0,0,
 							256,256,256,256];}
-			clearGrid();
-			createGrid(max++, ypos);
+			//clearGrid();
+			//createGrid(max++, ypos);
+			moveGrid();
 			mapValues(pads,valArray);
 			if (--i) {          // If i > 0, keep going
 				theLoop(i);       // Call the loop again, and pass it the current value of i
 			}
-		}, 10);
-	})(200);
+		}, 5);
+	})(1500);
 	
 });
 
 function clearGrid() {
 	$('div#maindiv').empty();
 	pads = [];
+}
+count=0;
+function moveGrid() {
+	count++;
+	$('div.sc_pad').each(function() {
+		$(this).css("margin-left", count);
+	});
 }
 
 /*
@@ -72,6 +80,10 @@ function createGrid(xval, yval) {
 	else if (agent.indexOf("ipad") 		!= -1) 	{ __ppi(160); }
 	else if (agent.indexOf("nexus 10") 		!= -1) 	{ __ppi(180); }
 	console.log("User Agent: " + agent);
+	
+	if(forcePPI>0) {
+		__ppi(forcePPI); //for the Microsoft Surface
+	}	
 	
 	// The size of the shape-clip pad in mm.
 	var SC_SIZE = __px(20);
