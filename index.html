@@ -28,30 +28,28 @@ $(document).ready(function() {
 	var max=10;
 	var ypos = 230;
 	createGrid(max,ypos);
-	valArray=[0,0,0,0,
-			  0,0,0,0,
-			  0,0,0,0,
-			  0,0,0,0];
-	mapValues(pads,valArray);
+	mapValues(pads);
 
 	(function theLoop (i) {
 		setTimeout(function () {
-			console.log(i);
 			if(i<50){
-				valArray=[0,0,0,0,
-							0,0,0,0,
-							0,0,0,0,
-							256,256,256,256];}
+				}
 			//clearGrid();
 			//createGrid(max++, ypos);
 			moveGrid();
-			mapValues(pads,valArray);
+			mapValues(pads);
 			if (--i) {          // If i > 0, keep going
 				theLoop(i);       // Call the loop again, and pass it the current value of i
 			}
-		}, 5);
+		}, 10);
 	})(1500);
-	
+	$("html").click(function(e){
+	   var parentOffset = $(this).offset(); 
+	   //or $(this).offset(); if you really just want the current element's offset
+	   var relX = e.pageX - parentOffset.left;
+	   var relY = e.pageY - parentOffset.top;
+	   console.log(relX);
+	});
 });
 
 function clearGrid() {
@@ -107,12 +105,25 @@ function createGrid(xval, yval) {
 			$('div#maindiv').append(pad._element);
 		}
 	}
+	
+	for (var i=0; i<pads.length; ++i) { pads[i].colour(0,255,0); pads[i].pulse(); }
 }
 
 function mapValues(pads, values) {
 	var count=0;
-	for(var i=0; i<values.length; i++) {
-		pads[i].height(values[i]*0.01);
+	var leftOffset = $('div.sc_control').last().offset().left;
+	for(var i=0; i<pads.length; i++) {
+		//pads[i].height(values[i]*0.01);
+		var padelement = pads[i]._element;
+		var loffset = $(padelement).offset().left;
+		if(loffset > 312 && loffset < 700) {
+			var val=256; pads[i].height(val*0.01);
+		} else if(loffset > 750 && loffset < 1220) {
+			pads[i].colour(255,0,255);
+		} else {
+			var val=0; pads[i].height(val*0.01);
+			pads[i].colour(0,255,0); 
+		}
 	}
 }
 
