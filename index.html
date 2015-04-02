@@ -7,12 +7,13 @@
 </head>
 
 <body>
-<h1 style="font-family:calibri">ShapeMap</h1>
-
-<br>
-<br>
-<div id="maindiv"></div>
-
+	<h1 style="font-family:calibri"></h1>
+	<button class="mapbutton" id="start">Start</button>
+	<button class="mapbutton" id="white">White</button>
+	<button class="mapbutton" id="black">Black</button>
+	<button class="mapbutton" id="map">Map</button>
+	<button id="leftmarker"></button>
+	<button id="bottommarker"></button>
 </body>
 
 </html>
@@ -20,48 +21,72 @@
 <script type="text/javascript">
 
 var pads = [];
-
 var PAUSED_STATE=true;
 var PLAY_STATE=true;
+var count=0;
 
 $(document).ready(function() {
-	var max=10;
-	var ypos = 230;
+	var max=25;
+	var ypos = 229;
 	createGrid(max,ypos);
 	mapValues(pads);
-
-	(function theLoop (i) {
-		setTimeout(function () {
-			if(i<50){
-				}
-			//clearGrid();
-			//createGrid(max++, ypos);
-			moveGrid();
-			mapValues(pads);
-			if (--i) {          // If i > 0, keep going
-				theLoop(i);       // Call the loop again, and pass it the current value of i
-			}
-		}, 10);
-	})(1500);
+	
+	$('button#map').click(function() {
+		$('body').css({
+			'background': 'url(images/terrain.jpg) no-repeat',
+			'background-size': '100%'
+		});
+	});
+	$('button#black').click(function() {
+		$('body').css('background', 'black');
+	});
+	$('button#white').click(function() {
+		$('body').css('background', 'white');
+	});
+	
+	var pos = $('div.sc_pad').last().position();
+	
+	$('button#leftmarker').css({
+		'top': (pos.top)+'px',
+		'left': (pos.left+160)+'px',
+		'position':'absolute'
+	});
+	$('button#bottommarker').css({
+		'top': (pos.top+160)+'px',
+		'left': (pos.left)+'px',
+		'position':'absolute'
+	});
+	
+	$('button#start').click(function() {
+		setTimeout(function(){
+			(function theLoop (i) {
+				setTimeout(function () {
+					moveGrid();
+					mapValues(pads);
+					if (--i) {          // If i > 0, keep going
+						theLoop(i);       // Call the loop again, and pass it the current value of i
+					}
+				}, 50); //default 20 : move every 20 ms
+			})(1500); //default 1500 : x offset for the block to move to
+		},5000); //default 5000: delay before the transition starts
+	});
+	//Just to get the positions on the document, on mouse click
 	$("html").click(function(e){
 	   var parentOffset = $(this).offset(); 
 	   //or $(this).offset(); if you really just want the current element's offset
 	   var relX = e.pageX - parentOffset.left;
 	   var relY = e.pageY - parentOffset.top;
-	   console.log(relX);
+	   console.log("Left: "+relX+" | Top: "+relY);
 	});
 });
 
-function clearGrid() {
-	$('div#maindiv').empty();
-	pads = [];
-}
-count=0;
 function moveGrid() {
 	count++;
 	$('div.sc_pad').each(function() {
 		$(this).css("margin-left", count);
 	});
+	$('button#leftmarker').css("margin-left", count);
+	$('button#bottommarker').css("margin-left", count);
 }
 
 /*
@@ -79,19 +104,18 @@ function createGrid(xval, yval) {
 	else if (agent.indexOf("nexus 10") 		!= -1) 	{ __ppi(180); }
 	console.log("User Agent: " + agent);
 	
-	if(forcePPI>0) {
-		__ppi(forcePPI); //for the Microsoft Surface
-	}	
+	if(forcePPI>0) { __ppi(forcePPI); }	//for the Microsoft Surface
 	
 	// The size of the shape-clip pad in mm.
 	var SC_SIZE = __px(20);
+
 	// The starting position of the grid
 	var X = xval;	var Y = yval;
 	
 	for (var x = 0; x < h_max; ++x) {
 		for (var y = 0; y < v_max; ++y) {
-			var pX = X + (x * 25); // horizontal spacing between pixels	
-			var pY = Y + (y * 25); // vertical spacing between pixels			
+			var pX = X + (x * 45); // horizontal spacing between pixels	
+			var pY = Y + (y * 45); // vertical spacing between pixels			
 			var pad = null;
 			pad = new ShapeClip({x: __px(pX), y: __px(pY), width: SC_SIZE, height: SC_SIZE});
 			
@@ -102,24 +126,27 @@ function createGrid(xval, yval) {
 			pad.rotate(180);
 			pad.PULSE_WIDTH=OVERRIDE_PULSE_WIDTH;
 			pads.push(pad);
-			$('div#maindiv').append(pad._element);
 		}
 	}
-	
 	for (var i=0; i<pads.length; ++i) { pads[i].colour(0,255,0); pads[i].pulse(); }
 }
 
 function mapValues(pads, values) {
 	var count=0;
-	var leftOffset = $('div.sc_control').last().offset().left;
 	for(var i=0; i<pads.length; i++) {
 		//pads[i].height(values[i]*0.01);
 		var padelement = pads[i]._element;
 		var loffset = $(padelement).offset().left;
-		if(loffset > 312 && loffset < 700) {
+		var toffset = $(padelement).offset().top;
+		if(loffset > 312 && loffset < 700) { //if in mountainous area
+			var val=256; pads[i].height(val*0.01); 
+		} else if(loffset > 750 && loffset < 1220) { //if over water
+			pads[i].colour(0,0,255);
+			var val=0; pads[i].height(val*0.01);
+			if(toffset>567 && toffset<680 && loffset>962 && toffset<1033) { pads[i].colour(0,255,0);} //if over small bit of land over water
+			if(toffset>567 && toffset<680 && loffset>1033 && loffset<1223) { var val=0; pads[i].height(val*0.01); pads[i].colour(0,255,0);} //if not over over small bit of land over water
+		} else if(loffset > 1223 && loffset < 1800) { //if in second mountainous area
 			var val=256; pads[i].height(val*0.01);
-		} else if(loffset > 750 && loffset < 1220) {
-			pads[i].colour(255,0,255);
 		} else {
 			var val=0; pads[i].height(val*0.01);
 			pads[i].colour(0,255,0); 
