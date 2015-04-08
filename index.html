@@ -12,8 +12,10 @@
 	<button class="mapbutton" id="white">White</button>
 	<button class="mapbutton" id="black">Black</button>
 	<button class="mapbutton" id="map">Map</button>
-	<button id="leftmarker"></button>
-	<button id="bottommarker"></button>
+	<span id="rightline"></span>
+	<span id="bottomline"></span>
+	<!-- <span id="topline"></span>
+	<span id="leftline"></span> -->
 </body>
 
 </html>
@@ -46,6 +48,8 @@ $(document).ready(function() {
 	
 	var pos = $('div.sc_pad').last().position();
 	
+	
+	
 	$('button#leftmarker').css({
 		'top': (pos.top)+'px',
 		'left': (pos.left+160)+'px',
@@ -66,7 +70,7 @@ $(document).ready(function() {
 					if (--i) {          // If i > 0, keep going
 						theLoop(i);       // Call the loop again, and pass it the current value of i
 					}
-				}, 50); //default 20 : move every 20 ms
+				}, 40); //default 50 : move every 50 ms
 			})(1500); //default 1500 : x offset for the block to move to
 		},5000); //default 5000: delay before the transition starts
 	});
@@ -85,8 +89,13 @@ function moveGrid() {
 	$('div.sc_pad').each(function() {
 		$(this).css("margin-left", count);
 	});
-	$('button#leftmarker').css("margin-left", count);
-	$('button#bottommarker').css("margin-left", count);
+	//$('button#leftmarker').css("margin-left", count);
+	//$('button#bottommarker').css("margin-left", count);
+	
+	$('span#rightline').css("margin-left", count);
+	$('span#bottomline').css("margin-left", count);
+	//$('span#topline').css("margin-left", count);
+	//$('span#leftline').css("margin-left", count);
 }
 
 /*
@@ -107,7 +116,7 @@ function createGrid(xval, yval) {
 	if(forcePPI>0) { __ppi(forcePPI); }	//for the Microsoft Surface
 	
 	// The size of the shape-clip pad in mm.
-	var SC_SIZE = __px(20);
+	var SC_SIZE = __px(25);
 
 	// The starting position of the grid
 	var X = xval;	var Y = yval;

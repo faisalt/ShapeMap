@@ -73,3 +73,35 @@ button#bottommarker {
 	border:none;
 }
 
+span#rightline {
+	height:336px;
+	border-right:2px solid black;
+	position:absolute;
+	left:331px;
+	top:480px;
+}
+
+span#bottomline {
+	width:336px;
+	border-bottom:2px solid black;
+	position:absolute;
+	left:0px;
+	top:816px;
+}
+
+span#topline {
+	width:336px;
+	border-bottom:2px solid black;
+	position:absolute;
+	left:0px;
+	top:480px;
+}
+
+span#leftline {
+	height:336px;
+	border-right:2px solid black;
+	position:absolute;
+	left:0px;
+	top:480px;
+}
+
